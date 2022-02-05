@@ -65,18 +65,16 @@ int main(int argc, char *argv[]) {
 
 
 /*-------------------------------------------------------------------------MPI INIT------------------------------------------------------------------------------------------------*/
-    MPI_Init(&argc , &argv);  // ------> MPI INIT : 
-    MPI_Comm_size( MPI_COMM_WORLD , &tasks ); //-------> MPI_Comm_size
-    MPI_Comm_rank( MPI_COMM_WORLD , &current_id); //--------> MPI_Comm_rank
+    MPI_Init(&argc , &argv);  // ------> MPI INIT : Inicializa el entorno de ejecucion
+    MPI_Comm_size( MPI_COMM_WORLD , &tasks ); //-------> MPI_Comm_size: Determina numero de procesos del comunicador
+    MPI_Comm_rank( MPI_COMM_WORLD , &current_id); //--------> MPI_Comm_rank: Determina el id del proceso en el comunicador
 
-    // Ruta de la imagen de entrada: Ej: img/input1.png
-    IMAGEN_ENTRADA = argv[1];
+ 
+    IMAGEN_ENTRADA = argv[1];    // Ruta de la imagen de entrada: Ej: img/input1.png  
+    IMAGEN_SALIDA = argv[2];   // Ruta de la imagen de salida: Ej: img/output1.png
 
-    // Ruta de la imagen de salida: Ej: img/output1.png
-    IMAGEN_SALIDA = argv[2];
-
-    // Argumento del filtro: Ej 8
-    ARG = atof(argv[3]);
+ 
+    ARG = atof(argv[3]);    // Argumento del filtro: Ej 8
     kernel[1][1] = ARG;
 
     // printf("[Debug] tasks=%d, current_id=%d\n", tasks, current_id);
@@ -166,7 +164,7 @@ int main(int argc, char *argv[]) {
     if(is_node(current_id)) {
         // Recibir los limites de la imagen
         int limits[3];
-        MPI_Recv(&(limits[0]), 3, MPI_INT, root, tag, MPI_COMM_WORLD, &status);
+        MPI_Recv(&(limits[0]), 3, MPI_INT, root, tag, MPI_COMM_WORLD, &status); //------ Recepcion basica mensaje
         from = limits[0];
         to = limits[1];
         maxi = limits[2];
@@ -213,7 +211,7 @@ int main(int argc, char *argv[]) {
 
     if(is_node(current_id)) {
         // Enviar la imagen procesada a la raiz
-        MPI_Send(&(board_output[0][0]), N*N, MPI_FLOAT, root, tag, MPI_COMM_WORLD);
+        MPI_Send(&(board_output[0][0]), N*N, MPI_FLOAT, root, tag, MPI_COMM_WORLD);  //----- Envio basico de mensaje
     } else if(is_root(current_id)) {
         // Guardar la imagen procesada en la matrix imagen_out (Unicamente para la raiz)
         for(int y = from; y <= to; ++y) {
